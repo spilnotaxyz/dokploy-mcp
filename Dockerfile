@@ -5,15 +5,17 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package and configuration (.npmrc carries pnpm's onlyBuiltDependencies
-# approval for esbuild; without it pnpm 10 fails with ERR_PNPM_IGNORED_BUILDS)
-COPY package.json pnpm-lock.yaml tsconfig.json .npmrc ./
+# Copy package and configuration
+COPY package.json pnpm-lock.yaml tsconfig.json ./
 
 # Copy source code
 COPY src ./src
 
-# Install dependencies and build
-RUN pnpm install --frozen-lockfile && pnpm run build
+# Install dependencies and build.
+# --ignore-scripts skips dependency build scripts (e.g. esbuild's native binary
+# postinstall); the build is pure `tsc` and never invokes them, and pnpm 10
+# otherwise fails the install with ERR_PNPM_IGNORED_BUILDS for unapproved scripts.
+RUN pnpm install --frozen-lockfile --ignore-scripts && pnpm run build
 
 # ----- Production Stage -----
 FROM node:lts-alpine
