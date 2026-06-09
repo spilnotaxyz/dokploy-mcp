@@ -5,8 +5,9 @@ WORKDIR /app
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package and configuration
-COPY package.json pnpm-lock.yaml tsconfig.json ./
+# Copy package and configuration (.npmrc carries pnpm's onlyBuiltDependencies
+# approval for esbuild; without it pnpm 10 fails with ERR_PNPM_IGNORED_BUILDS)
+COPY package.json pnpm-lock.yaml tsconfig.json .npmrc ./
 
 # Copy source code
 COPY src ./src
