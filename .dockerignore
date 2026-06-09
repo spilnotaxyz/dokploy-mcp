@@ -93,7 +93,7 @@ Makefile
 .travis.yml
 .circleci/
 
-# Package locks (can be regenerated)
+# Package locks for other package managers (this project uses pnpm-lock.yaml,
+# which must stay in the build context for `pnpm install --frozen-lockfile`)
 package-lock.json
 yarn.lock
-pnpm-lock.yaml
