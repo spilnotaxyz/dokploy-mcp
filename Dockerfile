@@ -33,6 +33,12 @@ COPY package.json pnpm-lock.yaml ./
 # Install only production dependencies
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
+# Default to the HTTP transport. The app's default is stdio, which in a
+# container has no attached stdin and exits immediately on EOF, causing a
+# restart loop. This is a sensible default for a long-running container and is
+# still overridable at runtime (e.g. MCP_TRANSPORT=sse or =stdio).
+ENV MCP_TRANSPORT=http
+
 # Expose port 3000 (internal container port)
 EXPOSE 3000
 
