@@ -7,6 +7,7 @@ import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { Hono } from "hono";
+import { createAuthMiddleware } from "./auth.js";
 import { createServer } from "./server.js";
 import { createLogger } from "./utils/logger.js";
 
@@ -35,8 +36,15 @@ export async function main() {
     sse: {} as Record<string, SSEServerTransport>,
   };
 
-  // Health check
+  // Health check (intentionally left unauthenticated for container probes)
   app.get("/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOString() }));
+
+  // Guard every transport endpoint with the shared-secret bearer token.
+  // /health above is deliberately excluded so HEALTHCHECK keeps working.
+  const auth = createAuthMiddleware();
+  app.use("/mcp", auth);
+  app.use("/sse", auth);
+  app.use("/messages", auth);
 
   // Modern Streamable HTTP - POST
   app.post("/mcp", async (c) => {

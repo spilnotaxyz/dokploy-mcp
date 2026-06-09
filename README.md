@@ -287,6 +287,7 @@ The configuration on Windows is slightly different compared to Linux or macOS. U
 |----------|----------|-------------|
 | `DOKPLOY_URL` | Yes | Your Dokploy server URL (e.g., `https://your-dokploy-server.com`) |
 | `DOKPLOY_API_KEY` | Yes | Your Dokploy API authentication token |
+| `MCP_AUTH_TOKEN` | No (strongly recommended for HTTP/SSE) | Shared secret guarding the inbound HTTP/SSE transport. When set, every request to `/mcp`, `/sse` and `/messages` must send `Authorization: Bearer <token>`; `/health` stays open for probes. When unset the server runs **unauthenticated** and logs a warning — acceptable only for trusted local (stdio) use, never for a public endpoint. Generate one with `openssl rand -hex 32`. |
 | `DOKPLOY_CUSTOM_HEADERS` | No | JSON object of additional upstream request headers. Header names and values must be strings. Reserved headers cannot be set here: `x-api-key`, `content-type`, `accept`. |
 | `DOKPLOY_ENABLED_TAGS` | No | Comma-separated list of tags to filter which tools are loaded (e.g., `project,application,postgres`) |
 | `DOKPLOY_TIMEOUT` | No | Request timeout in milliseconds (default: `30000`) |
